@@ -7,20 +7,115 @@
   color: var(--white);
 }
 
+/* The incoming slide fades in over the outgoing one, which stays visible underneath. Slides let
+   clicks through to the prev/next halves below; only the active slide's button catches them. */
 .hero__item {
   position: absolute;
   inset: 0;
+  z-index: 1;
   opacity: 0;
   visibility: hidden;
-  transition:
-    opacity 0.9s ease,
-    visibility 0s linear 0.9s;
+  pointer-events: none;
+}
+
+.hero__item.is-leaving {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
 }
 
 .hero__item.is-active {
+  z-index: 3;
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.9s ease;
+  transition: opacity 0.7s ease;
+}
+
+.hero__item.is-active .hero-slide__cta {
+  pointer-events: auto;
+}
+
+/* Text rises 50px into place one line after another; the outgoing text fades away. */
+.hero__item.is-active .hero-slide__content > * {
+  animation: hero-text-in 1s cubic-bezier(0.45, 0, 0.55, 1) both;
+}
+
+.hero__item.is-active .hero-slide__content > :nth-child(1) {
+  animation-delay: 0.15s;
+}
+
+.hero__item.is-active .hero-slide__content > :nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.hero__item.is-active .hero-slide__content > :nth-child(3) {
+  animation-delay: 0.45s;
+}
+
+.hero__item.is-active .hero-slide__content > :nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.hero__item.is-leaving .hero-slide__content > * {
+  animation: hero-text-out 0.6s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+@keyframes hero-text-in {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}
+
+@keyframes hero-text-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Left/right halves of the banner: thin chevron cursor, click steps back/forward. */
+.hero__nav {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  padding: 0;
+  border: 0;
+  background: none;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero__nav--prev {
+  left: 0;
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='66' viewBox='0 0 34 66' fill='none'%3E%3Cpolyline points='33,1 1,33 33,65' stroke='%23000' stroke-opacity='.25' stroke-width='3'/%3E%3Cpolyline points='33,1 1,33 33,65' stroke='%23fff' stroke-width='1.2'/%3E%3C/svg%3E")
+      17 33,
+    w-resize;
+}
+
+.hero__nav--next {
+  right: 0;
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='66' viewBox='0 0 34 66' fill='none'%3E%3Cpolyline points='1,1 33,33 1,65' stroke='%23000' stroke-opacity='.25' stroke-width='3'/%3E%3Cpolyline points='1,1 33,33 1,65' stroke='%23fff' stroke-width='1.2'/%3E%3C/svg%3E")
+      17 33,
+    e-resize;
+}
+
+.hero__nav:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: -6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__item.is-active {
+    transition-duration: 0.2s;
+  }
+  .hero__item.is-active .hero-slide__content > *,
+  .hero__item.is-leaving .hero-slide__content > * {
+    animation: none;
+  }
 }
 
 .hero-slide,
@@ -86,7 +181,7 @@
 
 .hero__dots {
   position: absolute;
-  z-index: 2;
+  z-index: 4;
   left: 50%;
   bottom: 58px;
   display: flex;
@@ -143,6 +238,136 @@
   .hero__dots {
     bottom: 43px;
     gap: 12px;
+  }
+}
+
+/* ---------- Shop banner (chaai "tea-shop" pattern) ----------
+   Image-only slideshow pinned at the top of the viewport, behind the page. The header drops into
+   the page flow right below it, and the header + content scroll up over it. On phones it simply
+   scrolls away. Heights follow the reference: 620 / 450 / 500 px, 1.5 × width on phones. */
+:root {
+  --shop-banner-h: 150vw;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --shop-banner-h: 500px;
+  }
+}
+
+@media (min-width: 1101px) {
+  :root {
+    --shop-banner-h: 450px;
+  }
+}
+
+@media (min-width: 1601px) {
+  :root {
+    --shop-banner-h: 620px;
+  }
+}
+
+.shop-banner__media {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--shop-banner-h);
+  overflow: hidden;
+  background: var(--navy-900);
+}
+
+@media (min-width: 768px) {
+  .shop-banner__media {
+    position: fixed;
+  }
+}
+
+/* Soft shade at the bottom so the transparent header stays readable on any photo. */
+.shop-banner__media::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  height: calc(var(--header-h) * 2.5);
+  background: linear-gradient(180deg, rgb(5 15 38 / 0) 0%, rgb(5 15 38 / 0.55) 100%);
+  pointer-events: none;
+}
+
+/* Header starts transparent on the bottom edge of the banner, then sticks to the top and gets its
+   bar (StickyHeader adds is-scrolled once it reaches the top). Keyed to <html data-shop-banner>
+   (see ShopBannerFlag), with `:has()` covering the first paint before hydration. */
+:is(html[data-shop-banner], html:not([data-hydrated]):has(.shop-banner)) .site-header,
+:is(html[data-shop-banner], html:not([data-hydrated]):has(.shop-banner)) .site-header.is-scrolled {
+  position: sticky;
+  top: 0;
+  margin-top: calc(var(--shop-banner-h) - var(--header-h));
+}
+
+/* Opaque page so it covers the pinned banner while scrolling. */
+:is(html[data-shop-banner], html:not([data-hydrated]):has(.shop-banner)) main {
+  background: var(--white);
+}
+
+/* Each image slowly zooms (alternately in and out) while the next one fades in over it. */
+.slideshow__slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.slideshow__slide.is-leaving {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+}
+
+.slideshow__slide.is-active {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.slideshow__slide img {
+  object-fit: cover;
+}
+
+/* Same declaration on both states, so the zoom carries on (no jump) while the next image fades in. */
+.slideshow__slide.is-active img,
+.slideshow__slide.is-leaving img {
+  animation: slideshow-zoom-in 8s linear both;
+}
+
+.slideshow__slide:nth-child(even).is-active img,
+.slideshow__slide:nth-child(even).is-leaving img {
+  animation-name: slideshow-zoom-out;
+}
+
+@keyframes slideshow-zoom-in {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes slideshow-zoom-out {
+  from {
+    transform: scale(1.1);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideshow__slide img {
+    animation: none !important;
   }
 }
 
@@ -285,6 +510,11 @@
   gap: 20px;
 }
 
+/* Stacked zig-zag stories: keep the images from touching corner to corner. */
+.split--full-bleed + .split--full-bleed {
+  padding-top: 40px;
+}
+
 .split--navy.split--full-bleed {
   min-height: 620px;
 }
@@ -343,6 +573,10 @@
   .split--full-bleed {
     min-height: 0;
   }
+  /* Stacked, the text already sits between the images. */
+  .split--full-bleed + .split--full-bleed {
+    padding-top: 0;
+  }
   .split--full-bleed .split__media {
     height: 260px;
   }
@@ -362,6 +596,8 @@
 .image-band {
   position: relative;
   height: 520px;
+  /* White gap so it never butts against the banner or an image section next to it. */
+  margin: 40px 0;
 }
 
 .image-band img {
@@ -371,6 +607,7 @@
 @media (max-width: 767px) {
   .image-band {
     height: 300px;
+    margin: 24px 0;
   }
 }
 

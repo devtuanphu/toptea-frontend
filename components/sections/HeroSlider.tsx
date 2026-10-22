@@ -56,6 +56,8 @@ export default function HeroSlider({ section }: { section: Section }) {
       slides={rendered}
       labels={slides.map((s) => s.title.replace(/\n/g, ' '))}
       interval={Number(section.autoplaySeconds) || 0}
+      prevLabel={section.prevLabel || ''}
+      nextLabel={section.nextLabel || ''}
     />
   );
 }

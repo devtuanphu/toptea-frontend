@@ -17,6 +17,7 @@ import { Cart, Checkout, OrderLookupSection, OrderSuccess, SearchResults } from 
 import { ContactPanel, Newsletter } from './engagement';
 import FeaturedProducts from './FeaturedProducts';
 import HeroSlider from './HeroSlider';
+import ShopBanner from './ShopBanner';
 import { ArticleListing, ProductGrid } from './listings';
 
 export type SectionData = {
@@ -55,6 +56,8 @@ export function SectionRenderer({ section, data }: { section: Section; data: Sec
       return <Process section={section} />;
     case 'home.featured-products':
       return <FeaturedProducts section={section} site={site} />;
+    case 'shop.banner-slider':
+      return <ShopBanner section={section} />;
     case 'shop.product-grid':
       return <ProductGrid section={section} site={site} products={data.products || []} />;
     case 'product.brew-guides':
@@ -89,7 +92,13 @@ export function SectionRenderer({ section, data }: { section: Section; data: Sec
   }
 }
 
-const HERO_COMPONENTS = new Set(['sections.page-banner', 'home.hero-slider', 'commerce.search-results']);
+// The shop banner puts the header in the page flow below it, so it needs no backdrop either.
+const HERO_COMPONENTS = new Set([
+  'sections.page-banner',
+  'home.hero-slider',
+  'commerce.search-results',
+  'shop.banner-slider',
+]);
 
 /** Renders a page's sections. Pages that don't open with a hero get a solid bar behind the header. */
 export default function Sections({ sections, data }: { sections: Section[]; data: SectionData }) {
