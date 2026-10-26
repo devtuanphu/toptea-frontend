@@ -604,6 +604,11 @@
   object-fit: cover;
 }
 
+/* Opening the page right under the header bar: no gap above. */
+.header-backdrop + .image-band {
+  margin-top: 0;
+}
+
 @media (max-width: 767px) {
   .image-band {
     height: 300px;

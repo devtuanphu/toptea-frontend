@@ -72,10 +72,10 @@ export function SplitStory({ section, site }: { section: Section; site: SiteCont
   );
 }
 
-export function ImageBand({ section }: { section: Section }) {
+export function ImageBand({ section, priority }: { section: Section; priority?: boolean }) {
   return (
     <div className="image-band">
-      <CmsImage picture={section.image as Picture} sizes="100vw" />
+      <CmsImage picture={section.image as Picture} sizes="100vw" priority={priority} />
     </div>
   );
 }

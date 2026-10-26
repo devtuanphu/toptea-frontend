@@ -29,7 +29,16 @@ export type SectionData = {
 };
 
 /** Maps a Strapi dynamic-zone component to its React section. */
-export function SectionRenderer({ section, data }: { section: Section; data: SectionData }) {
+export function SectionRenderer({
+  section,
+  data,
+  first,
+}: {
+  section: Section;
+  data: SectionData;
+  /** Opens the page: its image is above the fold. */
+  first?: boolean;
+}) {
   const { site } = data;
   switch (section.__component) {
     case 'sections.page-banner':
@@ -37,7 +46,7 @@ export function SectionRenderer({ section, data }: { section: Section; data: Sec
     case 'sections.split-story':
       return <SplitStory section={section} site={site} />;
     case 'sections.image-band':
-      return <ImageBand section={section} />;
+      return <ImageBand section={section} priority={first} />;
     case 'sections.quote-band':
       return <QuoteBand section={section} />;
     case 'sections.cta-band':
@@ -100,14 +109,42 @@ const HERO_COMPONENTS = new Set([
   'shop.banner-slider',
 ]);
 
-/** Renders a page's sections. Pages that don't open with a hero get a solid bar behind the header. */
-export default function Sections({ sections, data }: { sections: Section[]; data: SectionData }) {
+// Sections that render the page's H1.
+const H1_COMPONENTS = new Set([
+  'sections.page-banner',
+  'home.hero-slider',
+  'shop.banner-slider',
+  'commerce.order-success',
+  'commerce.search-results',
+  'system.not-found',
+]);
+
+/**
+ * Renders a page's sections. Pages that don't open with a hero get a solid bar behind the header;
+ * pages with no heading section (e.g. the about page, which opens with an image) get a hidden H1.
+ */
+export default function Sections({
+  sections,
+  data,
+  title,
+}: {
+  sections: Section[];
+  data: SectionData;
+  title?: string;
+}) {
   const opensWithHero = HERO_COMPONENTS.has(sections[0]?.__component);
+  const hasH1 = sections.some((s) => H1_COMPONENTS.has(s.__component));
   return (
     <>
+      {!hasH1 && title && <h1 className="visually-hidden">{title}</h1>}
       {!opensWithHero && <div className="header-backdrop" aria-hidden="true" />}
       {sections.map((section) => (
-        <SectionRenderer key={`${section.__component}-${section.id}`} section={section} data={data} />
+        <SectionRenderer
+          key={`${section.__component}-${section.id}`}
+          section={section}
+          data={data}
+          first={section === sections[0]}
+        />
       ))}
     </>
   );

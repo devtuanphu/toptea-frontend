@@ -23,5 +23,5 @@ export async function pageMetadata(type: PageType, path: string): Promise<Metada
 export async function CmsPage({ type, data }: { type: PageType; data?: Omit<SectionData, 'site'> }) {
   const [page, site] = await Promise.all([getPage(type), getSiteContext()]);
   if (!page) notFound();
-  return <Sections sections={page.sections} data={{ site, ...data }} />;
+  return <Sections sections={page.sections} data={{ site, ...data }} title={page.title} />;
 }
