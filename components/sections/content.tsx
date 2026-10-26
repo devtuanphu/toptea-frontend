@@ -72,10 +72,11 @@ export function SplitStory({ section, site }: { section: Section; site: SiteCont
   );
 }
 
-export function ImageBand({ section, priority }: { section: Section; priority?: boolean }) {
+/** Full-width photo; as the page's first section it runs under the transparent header (`hero`). */
+export function ImageBand({ section, hero }: { section: Section; hero?: boolean }) {
   return (
-    <div className="image-band">
-      <CmsImage picture={section.image as Picture} sizes="100vw" priority={priority} />
+    <div className={`image-band${hero ? ' image-band--hero' : ''}`}>
+      <CmsImage picture={section.image as Picture} sizes="100vw" priority={hero} />
     </div>
   );
 }

@@ -46,7 +46,7 @@ export function SectionRenderer({
     case 'sections.split-story':
       return <SplitStory section={section} site={site} />;
     case 'sections.image-band':
-      return <ImageBand section={section} priority={first} />;
+      return <ImageBand section={section} hero={first} />;
     case 'sections.quote-band':
       return <QuoteBand section={section} />;
     case 'sections.cta-band':
@@ -102,11 +102,13 @@ export function SectionRenderer({
 }
 
 // The shop banner puts the header in the page flow below it, so it needs no backdrop either.
+// An image band that opens the page runs under the transparent header like a banner.
 const HERO_COMPONENTS = new Set([
   'sections.page-banner',
   'home.hero-slider',
   'commerce.search-results',
   'shop.banner-slider',
+  'sections.image-band',
 ]);
 
 // Sections that render the page's H1.

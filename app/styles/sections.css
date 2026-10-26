@@ -604,15 +604,27 @@
   object-fit: cover;
 }
 
-/* Opening the page right under the header bar: no gap above. */
-.header-backdrop + .image-band {
+/* Opening the page: runs under the transparent header, with a shade at the top so it stays readable. */
+.image-band--hero {
   margin-top: 0;
+}
+
+.image-band--hero::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(var(--header-h) * 2.5);
+  background: linear-gradient(180deg, rgb(5 15 38 / 0.55) 0%, rgb(5 15 38 / 0) 100%);
+  pointer-events: none;
 }
 
 @media (max-width: 767px) {
   .image-band {
     height: 300px;
     margin: 24px 0;
+  }
+  .image-band--hero {
+    margin-top: 0;
   }
 }
 
